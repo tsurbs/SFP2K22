@@ -1,16 +1,24 @@
 from mimetypes import init
+import sys
 import numpy as np
 
 # Generate training data
 def f():
     a = int(np.random.uniform(0, 50))
     b = int(np.random.uniform(0, 50))
+    b -= b==a
 
-    return [a, b, a+b]
+    x = np.zeros((50), np.int32)
+    x[a] = 1
+    x[b] = 1
+    return x
 
 #X-train is [:2], Y-train is[2]
-a = np.array([f() for i in range(10000)])
-val = np.array([f() for i in range(10^3)])
+X_train = np.array([f() for i in range(10000)])
+Y_train = np.array([sum(np.where(X_train[i] == 1)) for i in range(10000)]).reshape((-1,1))
+X_val = np.array([f() for i in range(1000)])
+Y_val = np.array([sum(np.where(X_val[i] == 1)) for i in range(1000)]).reshape((-1,1))
+# print(Y_val.tolist())
 
 # initialize initial(random) weights from layer m to layer n, normalize so add to 1
 def initWeights(m_param, n_param):
@@ -64,11 +72,18 @@ losses,accuracies,val_accuracies=[],[],[]
 
 
 for i in range(epochs):
-    y = [a[i][2]]
-    x = np.zeros((50,2), np.int32)
-    x[a[i][0]][0] = 1
-    x[a[i][1]][1] = 1
+    # y = [a[i][2]]
+    # x = np.zeros((50,1), np.int32)
+    # x[a[i][0]][0] = 1
+    # x[a[i][1]][0] = 1
+    # x = x.reshape((-1,50))
 
+    sample=np.random.randint(0,X_train.shape[0],size=(batch))
+    # print(X_train.tolist())
+    x=X_train[sample].reshape((-1,50))
+
+    y=Y_train[sample]
+    # print(y.shape)
 
     out,update_l1,update_l2=forward_backward_pass(x,y)
     
@@ -83,11 +98,10 @@ for i in range(epochs):
     l2=l2-lr*update_l2
 
     if(i%20==0):    
-        X_val = np.zeros((50,2), np.int32)
-        X_val[a[i][0]][0] = 1
-        X_val[a[i][1]][1] = 1
+        X_val=X_val.reshape((-1,50))
         val_out=np.argmax(softmax(sigmoid(X_val.dot(l1)).dot(l2)),axis=1)
-        print(val_out)
-        val_acc=(val_out==a[i][2]).mean()
+        #print(X_val.shape, l1.shape, l2.shape)
+        #print(val_out)
+        val_acc=(val_out==Y_val).mean()
         val_accuracies.append(val_acc.item())
         if(i%500==0): print(f'For {i}th epoch: train accuracy: {accuracy:.3f} | validation accuracy:{val_acc:.3f}')
