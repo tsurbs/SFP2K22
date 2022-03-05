@@ -43,7 +43,6 @@ def forward_backward_pass(x,y):
     x_l1=x.dot(l1)
     x_sigmoid=sigmoid(x_l1)
 
-    print(x_sigmoid.shape)
     x_l2=x_sigmoid@l2
     out=softmax(x_l2)
 
@@ -66,10 +65,9 @@ losses,accuracies,val_accuracies=[],[],[]
 
 for i in range(epochs):
     y = [a[i][2]]
-    x = np.zeros((2,50), np.int32)
-    x[0][a[i][0]] = 1
-    x[1][a[i][1]] = 1
-    print(x)
+    x = np.zeros((50,2), np.int32)
+    x[a[i][0]][0] = 1
+    x[a[i][1]][1] = 1
 
 
     out,update_l1,update_l2=forward_backward_pass(x,y)
@@ -85,9 +83,9 @@ for i in range(epochs):
     l2=l2-lr*update_l2
 
     if(i%20==0):    
-        X_val = np.zeros((2,50), np.int32)
-        X_val[i][a[i][0]] = 1
-        X_val[i][a[i][1]] = 1
+        X_val = np.zeros((50,2), np.int32)
+        X_val[a[i][0]][0] = 1
+        X_val[a[i][1]][1] = 1
         val_out=np.argmax(softmax(sigmoid(X_val.dot(l1)).dot(l2)),axis=1)
         print(val_out)
         val_acc=(val_out==a[i][2]).mean()
