@@ -24,8 +24,8 @@ Y_val = np.array([sum(np.where(X_val[i] == 1)) for i in range(1000)]).reshape((-
 def initWeights(m_param, n_param):
     return np.random.uniform(-1, 1, size=(m_param, n_param)) / np.sqrt(m_param*n_param)
 
-l1 = initWeights(50,75)
-l2 = initWeights(75,100)
+l1 = initWeights(50,1000)
+l2 = initWeights(1000,100)
 
 
 def sigmoid(x):
